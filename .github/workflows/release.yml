@@ -21,7 +21,7 @@ jobs:
         id: release
       - name: Check outputs
         run: |
-          echo "Manifest: ${{ steps.release.outputs }}"
+          echo "Manifest: ${{ fromJson(steps.release.outputs) }}"
   release:
     needs: release-please
     runs-on: ubuntu-latest
