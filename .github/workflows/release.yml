@@ -19,6 +19,9 @@ jobs:
       - name: Release please
         uses: googleapis/release-please-action@v4
         id: release
+      - name: Check outputs
+        run: |
+          echo "Manifest: ${{ steps.release.outputs.manifest }}"
   release:
     needs: release-please
     runs-on: ubuntu-latest
