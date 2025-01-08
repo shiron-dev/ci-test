@@ -19,9 +19,6 @@ jobs:
       - name: Release please
         uses: googleapis/release-please-action@v4
         id: release
-      - name: Check outputs
-        run: |
-          echo 'Manifest: ${{ toJson(steps.release.outputs) }}'
   release:
     needs: release-please
     runs-on: ubuntu-latest
@@ -35,6 +32,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.package }}
+    if: ${{ needs.release-please.outputs.paths_released != '[]' }}
     steps:
       - uses: actions/checkout@v4
       - name: Get Dockerfiles
