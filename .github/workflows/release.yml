@@ -1,0 +1,41 @@
+name: release
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      manifest: ${{ steps.release.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Release please
+        uses: googleapis/release-please-action@v4
+        id: release
+  release:
+    needs: release-please
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.release-please.outputs.manifest) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          PACKAGE_NAME=$(echo ${{ matrix.package }} | jq -r .package-name)
+          TAG=$(echo ${{ matrix.package }} | jq -r .version)
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Check outputs
+        run: |
+          echo "Package Name: ${{ steps.vars.outputs.package_name }}"
+          echo "Tag: ${{ steps.vars.outputs.tag }}"
