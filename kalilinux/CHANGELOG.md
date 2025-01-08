@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/shiron-dev/ci-test/compare/kalilinux-v1.0.0...kalilinux-v1.1.0) (2025-01-08)
+
+
+### Features
+
+* hoge ([d60d011](https://github.com/shiron-dev/ci-test/commit/d60d01155ab1239cd012b63c7c30190db305422e))
+
 ## 1.0.0 (2025-01-08)
 
 
