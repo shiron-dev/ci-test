@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/shiron-dev/ci-test/compare/kalilinux-v1.1.0...kalilinux-v1.2.0) (2025-01-08)
+
+
+### Features
+
+* a ([dcc2477](https://github.com/shiron-dev/ci-test/commit/dcc2477d228b17096db08cd96904a4a9c1358030))
+
 ## [1.1.0](https://github.com/shiron-dev/ci-test/compare/kalilinux-v1.0.0...kalilinux-v1.1.0) (2025-01-08)
 
 
