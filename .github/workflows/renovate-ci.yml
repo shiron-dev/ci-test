@@ -1,0 +1,31 @@
+name: Renovate CI
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/renovate.json
+      - .github/workflows/renovate-ci.yml
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  renovate-dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm install renovate
+      - name: Dry-run Renovate
+        run: |
+          npx renovate '${{ github.repository }}' \
+            --dry-run=full \
+            --require-config=ignored
+        env:
+          RENOVATE_USERNAME: renovate[bot]
+          RENOVATE_GIT_AUTHOR: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RENOVATE_BASE_BRANCHES: ${{ github.sha }}
+          LOG_LEVEL: debug
+          RENOVATE_CONFIG_FILE: .github/renovate.json

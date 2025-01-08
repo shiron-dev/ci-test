@@ -9,6 +9,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       changed_dirs: ${{ steps.changed-dirs.outputs.changed_dirs }}
+      changed: ${{ steps.changed-dirs.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,6 +30,11 @@ jobs:
             | jq -s -r '(.[1].packages | keys) + .[0] | .[]' \
             | sort | uniq -d | jq -Rsc 'split("\n")[0:-1]')
           echo "changed_dirs=$CHANGED_DIRS" >> "$GITHUB_OUTPUT"
+          if [ $(echo "$CHANGED_DIRS" | jq '. | length') -eq 0 ]; then
+            echo "changed='false'" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed='true'" >> "$GITHUB_OUTPUT"
+          fi
           cat "$GITHUB_OUTPUT"
   docker:
     needs: detect-changes
@@ -43,6 +49,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.changed_dir }}
+    if: ${{ needs.detect-changes.outputs.changed == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - name: Get Dockerfiles

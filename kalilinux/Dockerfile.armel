@@ -1,6 +1,8 @@
 FROM kalilinux/kali-rolling:armel@sha256:87609414fe53a2709a638a1e37af66ded196fa8a98e73efa1a136e62fc351c36
 
 # Install the tools
+ENV KALI_META_VERSION=2025.1.2
+
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends kali-linux-core=2025.1.2 kali-linux-default=2025.1.2 kali-tools-web=2025.1.2 \
+  && apt-get install -y --no-install-recommends kali-linux-core=${KALI_META_VERSION} kali-linux-default=${KALI_META_VERSION} kali-tools-web=${KALI_META_VERSION} \
   && rm -rf /var/lib/apt/lists/*

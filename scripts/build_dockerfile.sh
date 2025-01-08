@@ -6,7 +6,8 @@ DOCKERFILE="$1"
 DIRNAME=$(dirname "$DOCKERFILE")
 BUILD_CONTEXT="$DIRNAME"
 
-PLATFORM=$("$SCRIPT_DIR/get_platform" "$DOCKERFILE")
+EXT="${DOCKERFILE##*.}"
+PLATFORM=$( yq "to_entries[] | select(.value[] == \"$EXT\") | .key" "$SCRIPT_DIR/../platforms.yaml" )
 echo "PLATFORM: $PLATFORM"
 
 echo "Building image: from $DOCKERFILE"
