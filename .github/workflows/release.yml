@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      manifest: ${{ steps.release.outputs.manifest }}
+      paths_released: ${{ steps.release.outputs.paths_released }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        package: ${{ fromJson(needs.release-please.outputs.manifest) }}
+        package: ${{ fromJson(needs.release-please.outputs.paths_released) }}
     steps:
       - uses: actions/checkout@v4
       - name: Set outputs
