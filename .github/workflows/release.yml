@@ -1,0 +1,77 @@
+name: release
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      paths_released: ${{ steps.release.outputs.paths_released }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Release please
+        uses: googleapis/release-please-action@v4
+        id: release
+  release:
+    needs: release-please
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.release-please.outputs.paths_released) }}
+    outputs:
+      package: ${{ matrix.package }}
+      dockerfiles: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    if: ${{ needs.release-please.outputs.paths_released != '[]' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Dockerfiles
+        id: get-dockerfiles
+        run: |
+          DOCKERFILES=$(find . -maxdepth 1 -name "Dockerfile.*" | sort | jq -Rsc 'split("\n")[0:-1]')
+          echo "dockerfiles=$DOCKERFILES" >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+  docker-build:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      matrix:
+        dockerfile: ${{ fromJson(needs.release.outputs.dockerfiles) }}
+    name: docker-build ${{ matrix.dockerfile }} (${{ needs.release.outputs.package }})
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "tag=$(cat .release-please-manifest.json | jq -r .${{ needs.release.outputs.package }})" >> $GITHUB_OUTPUT
+          echo "platform=$(./scripts/get_platform.sh ${{ needs.release.outputs.package }}/${{ matrix.dockerfile }})" >> $GITHUB_OUTPUT
+      - name: Check outputs
+        run: echo ${{ steps.vars.outputs.tag }}
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ needs.release.outputs.package }}
+          push: true
+          platforms: ${{ steps.vars.outputs.platform }}
+          file: "${{ needs.release.outputs.package }}/${{ matrix.dockerfile }}"
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ needs.release.outputs.package }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ needs.release.outputs.package }}:${{ steps.vars.outputs.tag }}

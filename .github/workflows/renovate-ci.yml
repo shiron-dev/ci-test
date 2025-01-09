@@ -10,6 +10,16 @@ permissions:
   contents: read
   pull-requests: read
 jobs:
+  renovate-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm install renovate
+      - name: Renovate config validator
+        run: |
+          npx renovate-config-validator --strict
   renovate-dry-run:
     runs-on: ubuntu-latest
     timeout-minutes: 10
