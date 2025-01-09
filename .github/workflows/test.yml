@@ -1,0 +1,25 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [1, 2, 3]
+    outputs:
+      ${{ matrix.package }}-package: ${{ matrix.package }}
+    steps:
+      - name: Test
+        run: echo "Testing package ${{ matrix.package }}"
+  test2:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Test 2
+        run: |
+          echo "Testing package ${{ needs.test.outputs.1-package }}"
+          echo "Testing package ${{ needs.test.outputs.2-package }}"
+          echo "Testing package ${{ needs.test.outputs.3-package }}"
