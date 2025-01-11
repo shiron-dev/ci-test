@@ -19,7 +19,7 @@ jobs:
         run: echo 'result=${{ hashFiles('./matrix.txt') }}' >> $GITHUB_OUTPUT
       - if: always()
         id: generate-outputs
-        uses: actions/github-script@v4
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs')
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: matrix-job-outputs
-      - uses: actions/github-script@v4
+      - uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs')
