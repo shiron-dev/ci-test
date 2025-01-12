@@ -20,7 +20,7 @@ jobs:
         uses: googleapis/release-please-action@v4
         id: release
       - name: echo
-        run: echo "${{ steps.release.outputs.pr.headBranchName }}"
+        run: echo "${{ steps.release.outputs.pr }}"
   package-check:
     needs: release-please
     runs-on: ubuntu-latest
