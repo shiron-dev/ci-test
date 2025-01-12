@@ -20,7 +20,8 @@ jobs:
         uses: googleapis/release-please-action@v4
         id: release
       - name: echo
-        run: echo "${{ toJson(steps.release.outputs) }}"
+        if: ${{ steps.release.outputs.paths_released != '[]' }}
+        run: echo "${{ fromJson(steps.release.outputs.pr).headBranchName }}"
   package-check:
     needs: release-please
     runs-on: ubuntu-latest
