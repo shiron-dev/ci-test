@@ -1,2 +1,0 @@
-FROM kalilinux/kali-rolling:amd64@sha256:c1c7d84e57939389a95cc385879c7e5231e77e296b40436bb06748972e4bb615
-#

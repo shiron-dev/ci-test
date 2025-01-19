@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
-    "kalilinux": {
+    "kali-linux": {
       "release-type": "simple",
-      "package-name": "kalilinux"
+      "package-name": "kali-linux"
     }
   }
 }
