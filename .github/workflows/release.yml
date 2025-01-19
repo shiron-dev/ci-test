@@ -54,7 +54,7 @@ jobs:
       - name: Set outputs
         id: vars
         run: |
-          echo "tag=$(jq -r .${{ needs.release.outputs.package }} .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "tag=$(jq -r ''.["${{ needs.release.outputs.package }}"]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
           echo "platform=$(./scripts/get_platform.sh ${{ needs.release.outputs.package }}/${{ matrix.dockerfile }})" >> "$GITHUB_OUTPUT"
       - name: Check outputs
         run: echo ${{ steps.vars.outputs.tag }}
