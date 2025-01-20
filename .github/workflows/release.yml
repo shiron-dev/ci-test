@@ -38,7 +38,7 @@ jobs:
           DOCKERFILES=$(find . -maxdepth 1 -name "Dockerfile.*" | sort | jq -Rsc 'split("\n")[0:-1]')
           echo "dockerfiles=$DOCKERFILES" >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
-      - uses: shiron-dev/actions/matrix-output-write@62546b6269a85ec43916c8473db0991273408c1f
+      - uses: shiron-dev/actions/matrix-output-write@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
         with:
           matrix-step-name: release
           matrix-key: ${{ matrix.package }}
@@ -51,7 +51,7 @@ jobs:
     outputs:
       result: ${{ steps.vars.outputs.result }}
     steps:
-      - uses: shiron-dev/actions/matrix-output-read@62546b6269a85ec43916c8473db0991273408c1f
+      - uses: shiron-dev/actions/matrix-output-read@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
         id: read
         with:
           matrix-step-name: release
@@ -100,7 +100,7 @@ jobs:
       # - id: build
       #   run: |
       #     echo "digest=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)" >> "$GITHUB_OUTPUT"
-      - uses: shiron-dev/actions/matrix-output-write@62546b6269a85ec43916c8473db0991273408c1f
+      - uses: shiron-dev/actions/matrix-output-write@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
         with:
           matrix-step-name: docker-build
           matrix-key: ${{ matrix.kv.key }}
@@ -114,7 +114,7 @@ jobs:
     outputs:
       result: ${{ steps.vars.outputs.result }}
     steps:
-      - uses: shiron-dev/actions/matrix-output-read@62546b6269a85ec43916c8473db0991273408c1f
+      - uses: shiron-dev/actions/matrix-output-read@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
         id: read
         with:
           matrix-step-name: docker-build
