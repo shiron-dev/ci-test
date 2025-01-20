@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.6.0...kali-linux-v1.7.0) (2025-01-20)
+
+
+### Features
+
+* hoge ([c50131b](https://github.com/shiron-dev/ci-test/commit/c50131bb5402ef263262b383386789ee4e0d2c7d))
+
 ## [1.6.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.5.1...kali-linux-v1.6.0) (2025-01-20)
 
 
