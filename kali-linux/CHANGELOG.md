@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.5.0...kali-linux-v1.5.1) (2025-01-20)
+
+
+### Bug Fixes
+
+* action ([4d2e7b7](https://github.com/shiron-dev/ci-test/commit/4d2e7b7b6e23a0314956b16d59bc94607d5d0cd7))
+
 ## [1.5.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.4.0...kali-linux-v1.5.0) (2025-01-20)
 
 
