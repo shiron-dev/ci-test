@@ -34,27 +34,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: release
+    outputs:
+      result: ${{ steps.read.outputs.result }}
     steps:
       - uses: shiron-dev/actions/matrix-output-read@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
         id: read
         with:
           matrix-step-name: release
       - name: Check outputs
-        run: echo '${{ steps.read.outputs.result }}'
-  # docker-build:
-  #   needs: release
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 360
-  #   strategy:
-  #     matrix:
-  #       dockerfile: ${{ fromJson(needs.release.outputs.dockerfiles) }}
-  #   name: docker-build ${{ matrix.dockerfile }} (${{ needs.release.outputs.package }})
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Set outputs
-  #       id: vars
-  #       run: |
-  #         echo "tag=$(jq -r '.["${{ needs.release.outputs.package }}"]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
-  #         echo "platform=$(./scripts/get_platform.sh ${{ needs.release.outputs.package }}/${{ matrix.dockerfile }})" >> "$GITHUB_OUTPUT"
-  #     - name: Check outputs
-  #       run: echo ${{ steps.vars.outputs.tag }}
+        run: |
+          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
+  docker-build:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      matrix:
+        kv: ${{ fromJson(needs.release-read.outputs.result) }}
+    name: docker-build ${{ matrix.kv.key }} (${{ matrix.kv.value }})
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "tag=$(jq -r '.["${{ matrix.kv.key }}"]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "platform=$(./scripts/get_platform.sh ${{ matrix.kv.key }}/${{ matrix.kv.value }})" >> "$GITHUB_OUTPUT"
+      - name: Check outputs
+        run: echo ${{ steps.vars.outputs.tag }}
