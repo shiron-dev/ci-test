@@ -43,7 +43,7 @@ jobs:
           matrix-step-name: release
       - name: Check outputs
         run: |
-          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
+          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -r '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
   docker-build:
     needs: release-read
     runs-on: ubuntu-latest
