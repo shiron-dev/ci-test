@@ -93,7 +93,7 @@ jobs:
           outputs: |-
             ${{ matrix.kv.value }}=${{ steps.build.outputs.digest }}
   docker-build-read:
-    needs: release-read
+    needs: docker-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
