@@ -26,7 +26,7 @@ jobs:
           cat "$GITHUB_OUTPUT"
       - uses: shiron-dev/actions/matrix-output-write@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
         with:
-          matrix-step-name: ${{ github.job }}
+          matrix-step-name: release
           matrix-key: ${{ matrix.package }}
           outputs: |-
             dockerfiles: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
@@ -88,7 +88,7 @@ jobs:
           echo "digest=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)" >> "$GITHUB_OUTPUT"
       - uses: shiron-dev/actions/matrix-output-write@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
         with:
-          matrix-step-name: ${{ github.job }}
+          matrix-step-name: docker-build
           matrix-key: ${{ matrix.kv.key }}
           outputs: |-
             ${{ matrix.kv.value }}=${{ steps.build.outputs.digest }}
@@ -105,5 +105,5 @@ jobs:
         id: vars
         run: |
           echo '${{ steps.read.outputs.result }}'
-          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '.[] | [.key as $k | .value[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
+          # echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '.[] | [.key as $k | .value[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
 
