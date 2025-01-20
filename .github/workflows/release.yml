@@ -44,6 +44,10 @@ jobs:
       - name: Check outputs
         run: |
           echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
+      - name: Set outputs
+        id: vars
+        run: |
+          echo '${{ steps.read.outputs.result }}'
   docker-build:
     needs: release-read
     runs-on: ubuntu-latest
