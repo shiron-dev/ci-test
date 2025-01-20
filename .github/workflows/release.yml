@@ -29,6 +29,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.package }}
+    if: ${{ needs.release-please.outputs.paths_released != '[]' }}
     steps:
       - uses: actions/checkout@v4
       - name: Get Dockerfiles
