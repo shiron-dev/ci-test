@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.2.0...kali-linux-v1.3.0) (2025-01-20)
+
+
+### Features
+
+* kali ([72e27f6](https://github.com/shiron-dev/ci-test/commit/72e27f6c2e13f229640bc5e7f60fd1b4ea114bee))
+
 ## [1.2.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.1.0...kali-linux-v1.2.0) (2025-01-20)
 
 
