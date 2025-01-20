@@ -7,32 +7,15 @@ permissions:
   contents: write
   pull-requests: write
 jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      paths_released: ${{ steps.release.outputs.paths_released }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Release please
-        uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4
-        id: release
   release:
-    needs: release-please
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
-        package: ${{ fromJson(needs.release-please.outputs.paths_released) }}
-    outputs:
-      package: ${{ matrix.package }}
-      dockerfiles: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
+        package: ["kali-linux"]
     defaults:
       run:
         working-directory: ${{ matrix.package }}
-    if: ${{ needs.release-please.outputs.paths_released != '[]' }}
     steps:
       - uses: actions/checkout@v4
       - name: Get Dockerfiles
@@ -41,37 +24,37 @@ jobs:
           DOCKERFILES=$(find . -maxdepth 1 -name "Dockerfile.*" | sort | jq -Rsc 'split("\n")[0:-1]')
           echo "dockerfiles=$DOCKERFILES" >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
-  docker-build:
-    needs: release
+      - uses: shiron-dev/actions/matrix-output-write@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
+        with:
+          matrix-step-name: ${{ github.job }}
+          matrix-key: ${{ matrix.package }}
+          outputs: |-
+            ${{ matrix.package }}: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
+  release-read:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    strategy:
-      matrix:
-        dockerfile: ${{ fromJson(needs.release.outputs.dockerfiles) }}
-    name: docker-build ${{ matrix.dockerfile }} (${{ needs.release.outputs.package }})
+    timeout-minutes: 10
+    needs: release
     steps:
-      - uses: actions/checkout@v4
-      - name: Set outputs
-        id: vars
-        run: |
-          echo "tag=$(jq -r '.["${{ needs.release.outputs.package }}"]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
-          echo "platform=$(./scripts/get_platform.sh ${{ needs.release.outputs.package }}/${{ matrix.dockerfile }})" >> "$GITHUB_OUTPUT"
+      - uses: shiron-dev/actions/matrix-output-read@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
+        id: read
+        with:
+          matrix-step-name: release
       - name: Check outputs
-        run: echo ${{ steps.vars.outputs.tag }}
-      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
-      - uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3
-      - uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3
-      - name: Build and push
-        uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6
-        with:
-          context: ${{ needs.release.outputs.package }}
-          push: true
-          platforms: ${{ steps.vars.outputs.platform }}
-          file: "${{ needs.release.outputs.package }}/${{ matrix.dockerfile }}"
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ needs.release.outputs.package }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ needs.release.outputs.package }}:${{ steps.vars.outputs.tag }}
+        run: cat '${{ steps.read.outputs.result }}'
+  # docker-build:
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 360
+  #   strategy:
+  #     matrix:
+  #       dockerfile: ${{ fromJson(needs.release.outputs.dockerfiles) }}
+  #   name: docker-build ${{ matrix.dockerfile }} (${{ needs.release.outputs.package }})
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set outputs
+  #       id: vars
+  #       run: |
+  #         echo "tag=$(jq -r '.["${{ needs.release.outputs.package }}"]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
+  #         echo "platform=$(./scripts/get_platform.sh ${{ needs.release.outputs.package }}/${{ matrix.dockerfile }})" >> "$GITHUB_OUTPUT"
+  #     - name: Check outputs
+  #       run: echo ${{ steps.vars.outputs.tag }}
