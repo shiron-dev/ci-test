@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.5.1...kali-linux-v1.6.0) (2025-01-20)
+
+
+### Features
+
+* release ([5bc591a](https://github.com/shiron-dev/ci-test/commit/5bc591a3f02e5681881c000e8f38cb1ae5f8af13))
+
 ## [1.5.1](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.5.0...kali-linux-v1.5.1) (2025-01-20)
 
 
