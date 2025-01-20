@@ -91,7 +91,7 @@ jobs:
           matrix-step-name: docker-build
           matrix-key: ${{ matrix.kv.key }}
           outputs: |-
-            ${{ matrix.kv.value }}=${{ steps.build.outputs.digest }}
+            ${{ matrix.kv.value }}: ${{ steps.build.outputs.digest }}
   docker-build-read:
     needs: docker-build
     runs-on: ubuntu-latest
