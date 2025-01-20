@@ -86,7 +86,7 @@ jobs:
       - id: build
         run: |
           echo "digest=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)" >> "$GITHUB_OUTPUT"
-      - uses: ./matrix-output-write
+      - uses: shiron-dev/actions/matrix-output-write@cf9f923728a28e230c4dcececa30f00b6d10cd05 # v1.2.0
         with:
           matrix-step-name: ${{ github.job }}
           matrix-key: ${{ matrix.kv.key }}
