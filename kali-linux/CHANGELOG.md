@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.6](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.11.5...kali-linux-v1.11.6) (2025-01-21)
+
+
+### Bug Fixes
+
+* hoge ([3686e1d](https://github.com/shiron-dev/ci-test/commit/3686e1d00aff55c7915ed07642ab03c4a39f60f3))
+
 ## [1.11.5](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.11.4...kali-linux-v1.11.5) (2025-01-21)
 
 
