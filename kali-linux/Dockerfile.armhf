@@ -3,7 +3,3 @@ FROM kalilinux/kali-rolling:armhf@sha256:da5112d0a1cb68e40926a03998497e658062246
 # Install the tools
 # renovate: datasource=repology depName=kali_rolling/kali-meta versioning=loose
 ENV KALI_META_VERSION=2025.1.3
-
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends kali-linux-core=${KALI_META_VERSION} kali-linux-default=${KALI_META_VERSION} kali-tools-web=${KALI_META_VERSION} \
-  && rm -rf /var/lib/apt/lists/*
