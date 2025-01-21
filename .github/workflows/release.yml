@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       paths_released: ${{ steps.release.outputs.paths_released }}
-      result: ${{ steps.release.outputs }}
+      result: ${{ toJSON(steps.release.outputs) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -158,8 +158,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=raw,value=${{ needs.release-please.outputs.result[ env.MAJOR_KEY ] }}.${{ needs.release-please.outputs.result[ env.MINOR_KEY ] }}
-            type=raw,value=${{ needs.release-please.outputs.result[ env.MAJOR_KEY ] }}.${{ needs.release-please.outputs.result[ env.MINOR_KEY ] }}.${{ needs.release-please.outputs.result[ env.PATCH_KEY ] }}
+            type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}
+            type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.PATCH_KEY ] }}
             type=raw,value=latest
       - name: Create manifest list and push
         run: |
