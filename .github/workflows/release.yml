@@ -129,6 +129,7 @@ jobs:
     strategy:
       matrix:
         kv: ${{ fromJson(needs.docker-build-read.outputs.result) }}
+    name: docker-merge ${{ matrix.kv.key }}
     steps:
       - run: echo '${{ needs.docker-build-read.outputs.result }}'
       - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
@@ -151,6 +152,8 @@ jobs:
       - name: Create manifest list and push
         run: |
           echo "$DOCKER_METADATA_OUTPUT_JSON"
+          echo "$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
+          echo "$(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' *)"
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' *)
       - name: Inspect image
