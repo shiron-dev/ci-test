@@ -157,7 +157,7 @@ jobs:
       - name: Create manifest list and push
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' $(echo '${{ toJSON(matrix.kv.values) }}' | jq -r '.values[]'))
+            $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' $(echo '${{ toJSON(matrix.kv.values) }}' | jq -r '.[]'))
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}:${{ steps.meta.outputs.version }}
