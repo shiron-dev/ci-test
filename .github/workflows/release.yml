@@ -133,6 +133,7 @@ jobs:
     name: docker-merge ${{ matrix.kv.key }}
     steps:
       - run: |
+          echo '${{ needs.docker-build-read.outputs.result }}'
           echo '${{ matrix.kv }}'
           echo '${{ matrix.kv.key }}'
           echo '${{ matrix.kv.values }}'
