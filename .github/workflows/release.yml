@@ -108,60 +108,60 @@ jobs:
           outputs: |-
             dockerfile: ${{ matrix.kv.value }}
             digest: ${{ steps.build.outputs.digest }}
-  docker-build-read:
-    needs: docker-build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      result: ${{ steps.vars.outputs.result }}
-    steps:
-      - uses: shiron-dev/actions/matrix-output-read@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
-        id: read
-        with:
-          matrix-step-name: docker-build
-      - name: Check outputs
-        id: vars
-        run: |
-          echo '${{ steps.read.outputs.result }}'
-          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '[{key: "kali-linux", values: (map(.value.digest))}]')" >> "$GITHUB_OUTPUT"
-  docker-merge:
-    needs:
-      - docker-build-read
-      - release-please
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        kv: ${{ fromJson(needs.docker-build-read.outputs.result) }}
-    name: docker-merge ${{ matrix.kv.key }}
-    env:
-      MAJOR_KEY: ${{ matrix.kv.key }}--major
-      MINOR_KEY: ${{ matrix.kv.key }}--minor
-      PATCH_KEY: ${{ matrix.kv.key }}--patch
-    steps:
-      - run: |
-          echo '${{ needs.docker-build-read.outputs.result }}'
-          echo '${{ matrix.kv }}'
-          echo '${{ matrix.kv.key }}'
-          echo '${{ toJSON(matrix.kv.values) }}'
-      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
-      - uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}
-            type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.PATCH_KEY ] }}
-            type=raw,value=latest
-      - name: Create manifest list and push
-        run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@%s ' $(echo '${{ toJSON(matrix.kv.values) }}' | jq -r '.[]'))
+  # docker-build-read:
+  #   needs: docker-build
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   outputs:
+  #     result: ${{ steps.vars.outputs.result }}
+  #   steps:
+  #     - uses: shiron-dev/actions/matrix-output-read@5a616af6005a2bbd883e95f0e2f1d508ce7e1e53
+  #       id: read
+  #       with:
+  #         matrix-step-name: docker-build
+  #     - name: Check outputs
+  #       id: vars
+  #       run: |
+  #         echo '${{ steps.read.outputs.result }}'
+  #         echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '[{key: "kali-linux", values: (map(.value.digest))}]')" >> "$GITHUB_OUTPUT"
+  # docker-merge:
+  #   needs:
+  #     - docker-build-read
+  #     - release-please
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   strategy:
+  #     matrix:
+  #       kv: ${{ fromJson(needs.docker-build-read.outputs.result) }}
+  #   name: docker-merge ${{ matrix.kv.key }}
+  #   env:
+  #     MAJOR_KEY: ${{ matrix.kv.key }}--major
+  #     MINOR_KEY: ${{ matrix.kv.key }}--minor
+  #     PATCH_KEY: ${{ matrix.kv.key }}--patch
+  #   steps:
+  #     - run: |
+  #         echo '${{ needs.docker-build-read.outputs.result }}'
+  #         echo '${{ matrix.kv }}'
+  #         echo '${{ matrix.kv.key }}'
+  #         echo '${{ toJSON(matrix.kv.values) }}'
+  #     - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GH_PAT }}
+  #     - uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3
+  #     - name: Docker meta
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}
+  #         tags: |
+  #           type=ref,event=branch
+  #           type=ref,event=pr
+  #           type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}
+  #           type=raw,value=${{ fromJSON(needs.release-please.outputs.result)[ env.MAJOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.MINOR_KEY ] }}.${{ fromJSON(needs.release-please.outputs.result)[ env.PATCH_KEY ] }}
+  #           type=raw,value=latest
+  #     - name: Create manifest list and push
+  #       run: |
+  #         docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+  #           $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@%s ' $(echo '${{ toJSON(matrix.kv.values) }}' | jq -r '.[]'))
