@@ -132,11 +132,6 @@ jobs:
         kv: ${{ fromJson(needs.docker-build-read.outputs.result) }}
     name: docker-merge ${{ matrix.kv.key }}
     steps:
-      - run: |
-          echo '${{ needs.docker-build-read.outputs.result }}'
-          echo '${{ matrix.kv }}'
-          echo '${{ matrix.kv.key }}'
-          echo '${{ matrix.kv.values }}'
       - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
         with:
           registry: ghcr.io
@@ -156,11 +151,8 @@ jobs:
             type=raw,value=latest
       - name: Create manifest list and push
         run: |
-          echo "$DOCKER_METADATA_OUTPUT_JSON"
-          echo "$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
-          echo "$(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@%s ' $(echo '${{ env.VALUES }}' | jq -r '.values[]'))"
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' $(echo '${{ env.VALUES }}' | jq -r '.values[]'))
+            $(printf 'ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}@sha256:%s ' $(echo '${{ toJSON(matrix.kv.values) }}' | jq -r '.values[]'))
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/${{ github.repository_owner }}/${{ matrix.kv.key }}:${{ steps.meta.outputs.version }}
