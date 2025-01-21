@@ -62,7 +62,7 @@ jobs:
           echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
   docker-build:
     needs: release-read
-    runs-on: ubuntu-latest
+    runs-on: ${{ contains(matrix.kv.value, 'arm') && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     timeout-minutes: 360
     strategy:
       matrix:
