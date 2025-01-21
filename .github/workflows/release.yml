@@ -121,6 +121,7 @@ jobs:
       - name: Check outputs
         id: vars
         run: |
+          echo '${{ steps.read.outputs.result }}'
           echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '[{key: "kali-linux", values: (map(.value.digest))}]')" >> "$GITHUB_OUTPUT"
   docker-merge:
     needs: docker-build-read
