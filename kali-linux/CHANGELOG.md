@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.8.0...kali-linux-v1.9.0) (2025-01-21)
+
+
+### Features
+
+* ok ([82ffa38](https://github.com/shiron-dev/ci-test/commit/82ffa38d8b9ea9556321e67a44ec3567ac42ad95))
+
 ## [1.8.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.7.1...kali-linux-v1.8.0) (2025-01-21)
 
 
