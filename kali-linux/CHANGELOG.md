@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.7.1...kali-linux-v1.8.0) (2025-01-21)
+
+
+### Features
+
+* bump ([ce2cce8](https://github.com/shiron-dev/ci-test/commit/ce2cce8a6d3b68166f1e15dfe36f7ef8c9ba7d4c))
+
 ## [1.7.1](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.7.0...kali-linux-v1.7.1) (2025-01-20)
 
 
