@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.11.17...kali-linux-v1.12.0) (2025-01-21)
+
+
+### Features
+
+* arm ([7e4f088](https://github.com/shiron-dev/ci-test/commit/7e4f08827829476e94198da0ecb1eb2f4ac3424b))
+
 ## [1.11.17](https://github.com/shiron-dev/ci-test/compare/kali-linux-v1.11.16...kali-linux-v1.11.17) (2025-01-21)
 
 
