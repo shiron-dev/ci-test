@@ -96,7 +96,6 @@ jobs:
           context: ${{ matrix.kv.key }}
           platforms: ${{ steps.vars.outputs.platform }}
           file: "${{ matrix.kv.key }}/${{ matrix.kv.value }}"
-          labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,"name=${{ steps.vars.outputs.ghcr_repo }}",push-by-digest=true,name-canonical=true,push=true
       # - id: build
       #   run: |
