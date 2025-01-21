@@ -131,7 +131,9 @@ jobs:
         kv: ${{ fromJson(needs.docker-build-read.outputs.result) }}
     name: docker-merge ${{ matrix.kv.key }}
     steps:
-      - run: echo '${{ needs.docker-build-read.outputs.result }}'
+      - run: |
+          echo '${{ matrix.kv.key }}'
+          echo '${{ matrix.kv.values }}'
       - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
         with:
           registry: ghcr.io
