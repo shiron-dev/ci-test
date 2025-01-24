@@ -17,7 +17,7 @@ jobs:
       - name: Get changed directories
         id: changed-dirs
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}..${{ github.event.pull_request.head.sha }})
+          CHANGED_FILES="$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}..${{ github.event.pull_request.head.sha }})"
           CHANGED_DIRS=""
           while IFS= read -r FILE; do
             DIR=$(echo "$FILE" | cut -d/ -f1)
@@ -30,10 +30,10 @@ jobs:
             | jq -s -r '(.[1].packages | keys) + .[0] | .[]' \
             | sort | uniq -d | jq -Rsc 'split("\n")[0:-1]')
           echo "changed_dirs=$CHANGED_DIRS" >> "$GITHUB_OUTPUT"
-          if [ $(echo "$CHANGED_DIRS" | jq '. | length') -eq 0 ]; then
-            echo "changed='false'" >> "$GITHUB_OUTPUT"
+          if [ "$(echo "$CHANGED_DIRS" | jq '. | length')" -eq 0 ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "changed='true'" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
           cat "$GITHUB_OUTPUT"
   docker:
@@ -43,9 +43,6 @@ jobs:
     strategy:
       matrix:
         changed_dir: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
-    outputs:
-      changed_dir: ${{ matrix.changed_dir }}
-      dockerfiles: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
     defaults:
       run:
         working-directory: ${{ matrix.changed_dir }}
@@ -58,20 +55,47 @@ jobs:
           DOCKERFILES=$(find . -maxdepth 1 -name "Dockerfile.*" | sort | jq -Rsc 'split("\n")[0:-1]')
           echo "dockerfiles=$DOCKERFILES" >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
-  docker-build:
-    needs: docker
+      - uses: shiron-dev/actions/matrix-output-write@eebb6216252466a58fb3aeeb2007cf8c43be1418 # v1.2.1
+        with:
+          matrix-step-name: release
+          matrix-key: ${{ matrix.changed_dir }}
+          outputs: |-
+            dockerfiles: ${{ steps.get-dockerfiles.outputs.dockerfiles }}
+  docker-read:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: docker
+    outputs:
+      result: ${{ steps.vars.outputs.result }}
+    steps:
+      - uses: shiron-dev/actions/matrix-output-read@eebb6216252466a58fb3aeeb2007cf8c43be1418 # v1.2.1
+        id: read
+        with:
+          matrix-step-name: release
+      - name: Check outputs
+        id: vars
+        run: |
+          echo "result=$(echo '${{ steps.read.outputs.result }}' | jq -c '.[] | [.key as $k | .value.dockerfiles[] | {key: $k, value: .}]')" >> "$GITHUB_OUTPUT"
+  docker-build:
+    needs: docker-read
+    runs-on: ${{ contains(matrix.kv.value, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     timeout-minutes: 360
     strategy:
       matrix:
-        dockerfile: ${{ fromJson(needs.docker.outputs.dockerfiles) }}
-    defaults:
-      run:
-        working-directory: ${{ needs.docker.outputs.changed_dir }}
-    name: docker-build ${{ matrix.dockerfile }} (${{ needs.docker.outputs.changed_dir }})
+        kv: ${{ fromJson(needs.docker-read.outputs.result) }}
+    name: docker-build ${{ matrix.kv.key }} (${{ matrix.kv.value }})
     steps:
       - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "platform=$(./scripts/get_platform.sh ${{ matrix.kv.key }}/${{ matrix.kv.value }})" >> "$GITHUB_OUTPUT"
       - uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3
       - uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3
-      - name: Build Docker images
-        run: ../scripts/build_dockerfile.sh ${{ matrix.dockerfile }}
+      - name: Build
+        uses: docker/build-push-action@67a2d409c0a876cbe6b11854e3e25193efe4e62d # v6
+        id: build
+        with:
+          context: ${{ matrix.kv.key }}
+          platforms: ${{ steps.vars.outputs.platform }}
+          file: "${{ matrix.kv.key }}/${{ matrix.kv.value }}"
